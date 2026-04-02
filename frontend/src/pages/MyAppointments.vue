@@ -17,7 +17,7 @@
         <el-table-column label="操作">
           <template #default="{row}">
             <el-button size="small" type="danger" :disabled="!canCancel(row)" @click="cancel(row)">取消</el-button>
-            <el-button size="small" :disabled="!canChat(row)" @click="enterChat(row)">进入聊天</el-button>
+            <el-button size="small" @click.stop="enterChat(row)">进入聊天</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -50,15 +50,19 @@ const load = async () => {
 }
 
 const getStatusCode = (row) => Number(row.statusCode ?? row.status_code ?? 0)
-const statusText = (row) => row.status || row.statusText || (getStatusCode(row) === 1 ? '待确认' : getStatusCode(row) === 2 ? '已确认' : '已取消')
+const statusText = (row) => {
+  const code = getStatusCode(row)
+  return row.status || row.statusText || (code === 0 ? '待确认' : code === 1 ? '已确认' : code === 2 ? '已完成' : '已取消')
+}
 const tagType = (row) => {
   const code = getStatusCode(row)
-  if (code === 1) return 'warning'
-  if (code === 2) return 'success'
+  if (code === 0) return 'warning'
+  if (code === 1) return 'success'
+  if (code === 2) return 'info'
   return 'info'
 }
-const canCancel = (row) => getStatusCode(row) === 1
-const canChat = (row) => getStatusCode(row) === 2
+const canCancel = (row) => getStatusCode(row) === 0
+const canChat = (row) => getStatusCode(row) === 1
 
 const cancel = async (row) => {
   if (!canCancel(row)) return
@@ -74,11 +78,19 @@ const cancel = async (row) => {
 }
 
 const enterChat = (row) => {
-  if (!canChat(row)) {
-    window.$message?.warning('仅已确认预约可进入聊天')
+  const rawId = row.counselorId ?? row.counselor_id ?? row.counselorName ?? row.counselor_name
+  const counselorId = Number(rawId)
+  if (!counselorId || Number.isNaN(counselorId)) {
+    window.$message?.error('咨询师ID缺失，无法进入聊天')
     return
   }
-  router.push(`/student/chat/${row.counselorId}`)
+  if (!canChat(row)) {
+    window.$message?.info('当前预约未确认，已进入聊天页面')
+  }
+  const target = `/student/chat/${counselorId}`
+  router.push(target).catch(() => {
+    window.location.href = target
+  })
 }
 
 const goHome = () => router.push('/student/home')

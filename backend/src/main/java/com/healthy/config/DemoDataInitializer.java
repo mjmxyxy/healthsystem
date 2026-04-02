@@ -25,11 +25,11 @@ public class DemoDataInitializer implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         ensureDemoUser("student_demo", "123456", "学生演示账号", "student");
         ensureDemoUser("counselor_demo", "123456", "咨询师演示账号", "counselor");
+        ensureDemoUser("admin_demo", "123456", "管理员演示账号", "admin");
     }
 
     private void ensureDemoUser(String account, String password, String name, String role) {
-        User exist = userMapper.selectOne(new QueryWrapper<User>().eq("account", account));
-        if (exist != null) return;
+        if (userMapper.countByAccount(account) > 0) return;
 
         User u = new User();
         u.setAccount(account);

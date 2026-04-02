@@ -21,6 +21,7 @@
       <el-button text @click="goAssessments">测评历史</el-button>
       <el-button text @click="goCounselors">咨询师预约</el-button>
       <el-button text @click="goAppointments">我的预约</el-button>
+      <el-button text @click="goArticles">心理科普</el-button>
       <el-button text @click="goProfile">个人中心</el-button>
     </div>
 
@@ -61,6 +62,7 @@ const goScales = () => router.push('/student/scales')
 const goAssessments = () => router.push('/student/assessments')
 const goCounselors = () => router.push('/student/counselors')
 const goAppointments = () => router.push('/student/appointments')
+const goArticles = () => router.push('/student/articles')
 const goProfile = () => router.push('/student/profile')
 
 const userLabel = computed(() => {

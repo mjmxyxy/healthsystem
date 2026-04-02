@@ -35,7 +35,7 @@ CREATE TABLE counselor (
   schedule JSON DEFAULT NULL,
   audit_status TINYINT NOT NULL DEFAULT 0 COMMENT '0=未提交/1=待审核/2=通过/3=拒绝',
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (id) REFERENCES `user`(id) ON DELETE CASCADE
+  FOREIGN KEY (id) REFERENCES `accounts`(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 3. 预约表 (appointment)
@@ -49,8 +49,8 @@ CREATE TABLE appointment (
   status TINYINT NOT NULL DEFAULT 0 COMMENT '0=待确认,1=已确认,2=已完成,3=已取消',
   note VARCHAR(512) DEFAULT NULL,
   create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES `user`(id),
-  FOREIGN KEY (counselor_id) REFERENCES `user`(id),
+  FOREIGN KEY (user_id) REFERENCES `accounts`(id),
+  FOREIGN KEY (counselor_id) REFERENCES `accounts`(id),
   INDEX idx_counselor_time (counselor_id, appt_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -113,7 +113,7 @@ CREATE TABLE assessment (
   answers JSON NOT NULL,
   test_time DATETIME NOT NULL,
   create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES `user`(id),
+  FOREIGN KEY (user_id) REFERENCES `accounts`(id),
   FOREIGN KEY (scale_id) REFERENCES scale(id),
   INDEX idx_user_testtime (user_id, test_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -129,7 +129,7 @@ CREATE TABLE article (
   status TINYINT NOT NULL DEFAULT 0 COMMENT '0=draft,1=pending,2=published,3=rejected',
   publish_time DATETIME DEFAULT NULL,
   create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (author_id) REFERENCES `user`(id)
+  FOREIGN KEY (author_id) REFERENCES `accounts`(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 10. 预警表 (warning)
@@ -142,7 +142,7 @@ CREATE TABLE warning (
   status TINYINT NOT NULL DEFAULT 0 COMMENT '0=未处理,1=处理中,2=已处理',
   handler_id INT DEFAULT NULL,
   create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES `user`(id),
+  FOREIGN KEY (user_id) REFERENCES `accounts`(id),
   FOREIGN KEY (assessment_id) REFERENCES assessment(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -157,6 +157,6 @@ CREATE TABLE notification (
   is_read TINYINT NOT NULL DEFAULT 0,
   target_url VARCHAR(512) DEFAULT NULL,
   create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES `user`(id),
+  FOREIGN KEY (user_id) REFERENCES `accounts`(id),
   INDEX idx_user_unread (user_id, is_read)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

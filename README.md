@@ -1,5 +1,7 @@
 项目：校园心理咨询平台（轻量化前后端分离骨架）
 
+快速运行与管理员端说明请查看：`RUNNING_GUIDE.md`
+
 本仓库为按需求生成的初始脚手架，包含：
 
 - 后端（Spring Boot + MyBatis-Plus + MySQL + WebSocket）骨架模板

@@ -12,7 +12,22 @@ import StudentHome from './pages/StudentHome.vue'
 import ScaleList from './pages/ScaleList.vue'
 import TestPage from './pages/TestPage.vue'
 import CounselorHome from './pages/CounselorHome.vue'
+import CounselorShell from './components/CounselorShell.vue'
+import CounselorDashboard from './pages/CounselorDashboard.vue'
+import CounselorAppointments from './pages/CounselorAppointments.vue'
+import CounselorChat from './pages/CounselorChat.vue'
+import CounselorStudents from './pages/CounselorStudents.vue'
+import CounselorReports from './pages/CounselorReports.vue'
+import CounselorProfile from './pages/CounselorProfile.vue'
+import CounselorArticles from './pages/CounselorArticles.vue'
 import AdminHome from './pages/AdminHome.vue'
+import AdminShell from './components/AdminShell.vue'
+import AdminStudents from './pages/AdminStudents.vue'
+import AdminCounselors from './pages/AdminCounselors.vue'
+import AdminScaleQuestions from './pages/AdminScaleQuestions.vue'
+import AdminAppointments from './pages/AdminAppointments.vue'
+import AdminArticlesReview from './pages/AdminArticlesReview.vue'
+import AdminProfile from './pages/AdminProfile.vue'
 import Register from './pages/Register.vue'
 import ResetPassword from './pages/ResetPassword.vue'
 import ChatAI from './pages/ChatAI.vue'
@@ -21,6 +36,8 @@ import CounselorDetail from './pages/CounselorDetail.vue'
 import MyAppointments from './pages/MyAppointments.vue'
 import ChatRoom from './pages/ChatRoom.vue'
 import StudentProfile from './pages/StudentProfile.vue'
+import StudentArticles from './pages/StudentArticles.vue'
+import StudentArticleDetail from './pages/StudentArticleDetail.vue'
 import ReportDetail from './pages/ReportDetail.vue'
 import History from './pages/History.vue'
 
@@ -35,8 +52,32 @@ const studentChildren = [
   { path: 'counselor/:id', component: CounselorDetail },
   { path: 'appointments', component: MyAppointments },
   { path: 'chat/:id', component: ChatRoom },
+  { path: 'articles', component: StudentArticles },
+  { path: 'articles/:id', component: StudentArticleDetail },
   { path: 'profile', component: StudentProfile },
   { path: 'ai-chat', component: ChatAI }
+]
+
+const counselorChildren = [
+  { path: '', redirect: '/counselor/dashboard' },
+  { path: 'dashboard', component: CounselorDashboard },
+  { path: 'appointments', component: CounselorAppointments },
+  { path: 'chat/:studentId', component: CounselorChat },
+  { path: 'students', component: CounselorStudents },
+  { path: 'reports', component: CounselorReports },
+  { path: 'articles', component: CounselorArticles },
+  { path: 'profile', component: CounselorProfile }
+]
+
+const adminChildren = [
+  { path: '', redirect: '/admin/dashboard' },
+  { path: 'dashboard', component: AdminHome },
+  { path: 'students', component: AdminStudents },
+  { path: 'counselors', component: AdminCounselors },
+  { path: 'scales', component: AdminScaleQuestions },
+  { path: 'appointments', component: AdminAppointments },
+  { path: 'articles', component: AdminArticlesReview },
+  { path: 'profile', component: AdminProfile }
 ]
 
 const routes = [
@@ -50,8 +91,10 @@ const routes = [
   { path: '/counselors', redirect: '/student/counselors' },
   { path: '/counselor/:id', redirect: (to: any) => `/student/counselor/${to.params.id}` },
   { path: '/chat/with/:counselorId', redirect: (to: any) => `/student/chat/${to.params.counselorId}` },
-  { path: '/counselor/home', component: CounselorHome },
-  { path: '/admin/home', component: AdminHome }
+  { path: '/counselor/home', redirect: '/counselor/dashboard' },
+  { path: '/counselor', component: CounselorShell, children: counselorChildren },
+  { path: '/admin/home', redirect: '/admin/dashboard' },
+  { path: '/admin', component: AdminShell, children: adminChildren }
 ]
 
 const router = createRouter({
@@ -61,7 +104,20 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   const token = localStorage.getItem('token') || localStorage.getItem('jwt_token')
+  const role = localStorage.getItem('role')
   if (to.path.startsWith('/student') && !token) {
+    return '/'
+  }
+  if (to.path.startsWith('/counselor') && !token) {
+    return '/'
+  }
+  if (to.path.startsWith('/counselor') && role && role !== 'counselor') {
+    return '/'
+  }
+  if (to.path.startsWith('/admin') && !token) {
+    return '/'
+  }
+  if (to.path.startsWith('/admin') && role && role !== 'admin') {
     return '/'
   }
   return true

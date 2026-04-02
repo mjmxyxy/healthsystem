@@ -1,12 +1,18 @@
 package com.healthy.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.healthy.entity.Article;
 import com.healthy.entity.User;
+import com.healthy.mapper.ArticleMapper;
 import com.healthy.service.UserService;
+import com.healthy.util.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -16,6 +22,48 @@ public class StudentController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ArticleMapper articleMapper;
+
+    @GetMapping("/articles")
+    public ApiResponse<?> listArticles() {
+        List<Article> rows = articleMapper.selectList(new QueryWrapper<Article>()
+                .eq("status", 2)
+                .orderByDesc("publish_time")
+                .orderByDesc("create_time"));
+        List<Map<String, Object>> data = rows.stream().map(this::toArticleVo).toList();
+        return ApiResponse.ok(data);
+    }
+
+    @GetMapping("/articles/{id}")
+    public ApiResponse<?> articleDetail(@PathVariable Long id) {
+        Article row = articleMapper.selectById(id);
+        if (row == null || row.getStatus() == null || row.getStatus() != 2) {
+            return ApiResponse.error("article not found");
+        }
+        return ApiResponse.ok(toArticleVo(row));
+    }
+
+    private Map<String, Object> toArticleVo(Article row) {
+        String authorName = "咨询师";
+        if (row.getAuthorId() != null) {
+            User author = userService.findById(row.getAuthorId());
+            if (author != null && author.getName() != null && !author.getName().isBlank()) {
+                authorName = author.getName();
+            }
+        }
+        Map<String, Object> m = new HashMap<>();
+        m.put("id", row.getId());
+        m.put("title", row.getTitle());
+        m.put("content", row.getContent());
+        m.put("cover", row.getCover());
+        m.put("authorId", row.getAuthorId());
+        m.put("authorName", authorName);
+        m.put("publishTime", row.getPublishTime());
+        m.put("createTime", row.getCreateTime());
+        return m;
+    }
 
     @GetMapping("/profile")
     public ResponseEntity<?> profile(@RequestParam(required = false) Long userId, Principal principal) {

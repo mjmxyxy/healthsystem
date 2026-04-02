@@ -46,7 +46,8 @@ const send = async () => {
     push('bot', reply)
   } catch (err) {
     console.error(err)
-    push('bot', '请求出错，请检查后端或网络')
+    const detail = err?.response?.data?.detail || err?.response?.data?.error || err?.message
+    push('bot', `请求出错：${detail || '请检查后端或网络'}`)
   } finally {
     loading.value = false
   }

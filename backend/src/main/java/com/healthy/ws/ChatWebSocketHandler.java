@@ -1,5 +1,10 @@
 package com.healthy.ws;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.healthy.entity.AppointmentRecord;
+import com.healthy.mapper.AppointmentMapper;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -11,8 +16,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ChatWebSocketHandler extends TextWebSocketHandler {
 
+    private final AppointmentMapper appointmentMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public ChatWebSocketHandler(AppointmentMapper appointmentMapper) {
+        this.appointmentMapper = appointmentMapper;
+    }
+
     // map userId -> session
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
+    private final Map<String, String> sessionUserMap = new ConcurrentHashMap<>();
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -23,33 +36,36 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 String[] parts = q.split("userId=");
                 String userId = parts[1].split("&")[0];
                 sessions.put(userId, session);
+                sessionUserMap.put(session.getId(), userId);
             }
         }
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        // message expected JSON: {toUserId: "123", text: "hello"}
         String payload = message.getPayload();
-        // simple parsing (no dependency)
         String to = null;
-        String text = payload;
+        String from = sessionUserMap.get(session.getId());
         try {
-            if (payload.contains("toUserId")) {
-                int i = payload.indexOf("toUserId");
-                int c = payload.indexOf(':', i);
-                int start = payload.indexOf('"', c) + 1;
-                int end = payload.indexOf('"', start);
-                to = payload.substring(start, end);
+            JsonNode root = objectMapper.readTree(payload);
+            if (root.has("toUserId")) to = root.get("toUserId").asText();
+            if (root.has("fromUserId")) from = root.get("fromUserId").asText(from);
+        } catch (Exception ignored) {
+        }
+
+        if (from == null || to == null) {
+            if (session.isOpen()) {
+                session.sendMessage(new TextMessage("{\"error\":\"invalid payload\"}"));
             }
-            if (payload.contains("text")) {
-                int i = payload.indexOf("text");
-                int c = payload.indexOf(':', i);
-                int start = payload.indexOf('"', c) + 1;
-                int end = payload.indexOf('"', start);
-                text = payload.substring(start, end);
+            return;
+        }
+
+        if (!canChat(from, to)) {
+            if (session.isOpen()) {
+                session.sendMessage(new TextMessage("{\"error\":\"chat not allowed: appointment not confirmed\"}"));
             }
-        } catch (Exception ignored) {}
+            return;
+        }
 
         if (to != null && sessions.containsKey(to)) {
             WebSocketSession target = sessions.get(to);
@@ -62,5 +78,22 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         sessions.values().removeIf(s -> s.getId().equals(session.getId()));
+        sessionUserMap.remove(session.getId());
+    }
+
+    private boolean canChat(String fromUserId, String toUserId) {
+        try {
+            long a = Long.parseLong(fromUserId);
+            long b = Long.parseLong(toUserId);
+            long count = appointmentMapper.selectCount(new QueryWrapper<AppointmentRecord>()
+                    .eq("status", 1)
+                    .and(q -> q
+                            .and(x -> x.eq("user_id", a).eq("counselor_id", b))
+                            .or(x -> x.eq("user_id", b).eq("counselor_id", a))
+                    ));
+            return count > 0;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 }

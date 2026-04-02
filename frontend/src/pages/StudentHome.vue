@@ -21,6 +21,10 @@
             <h3>我的预约</h3>
             <p>查看状态、取消预约、进入聊天</p>
           </div>
+          <div class="nav-card card-hover" @click="goArticles">
+            <h3>心理科普</h3>
+            <p>阅读咨询师发布的心理健康科普文章</p>
+          </div>
           <div class="nav-card card-hover" @click="goProfile">
             <h3>个人中心</h3>
             <p>修改资料与密码，安全退出登录</p>
@@ -37,6 +41,7 @@ const goScales = () => router.push('/student/scales')
 const goHistory = () => router.push('/student/assessments')
 const goCounselors = () => router.push('/student/counselors')
 const goAppointments = () => router.push('/student/appointments')
+const goArticles = () => router.push('/student/articles')
 const goProfile = () => router.push('/student/profile')
 </script>
 

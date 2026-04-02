@@ -22,7 +22,7 @@
           <el-button native-type="button" @click="goReset" style="margin-left:8px">忘记密码</el-button>
         </el-form-item>
         <div style="color:#888;font-size:12px;line-height:1.6;margin-top:8px">
-          演示账号：student_demo / 123456，咨询师账号：counselor_demo / 123456
+          演示账号：student_demo / 123456，咨询师账号：counselor_demo / 123456，管理员账号：admin_demo / 123456
         </div>
       </el-form>
     </el-card>
