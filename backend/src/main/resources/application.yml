@@ -1,0 +1,55 @@
+server:
+  port: 8082
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/healthy_db?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root}
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+
+  http:
+    encoding:
+      enabled: true
+      charset: UTF-8
+      force: true
+
+# 输出到文件，便于后续抓取完整异常堆栈
+logging:
+  file:
+    name: logs/healthy-backend.log
+  level:
+    root: INFO
+  mybatis-plus:
+    configuration:
+      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+      map-underscore-to-camel-case: true
+    global-config:
+      db-config:
+        map-underscore-to-camel-case: true
+
+# Swagger/OpenAPI
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+# File upload
+app:
+  upload-dir: ./uploads
+
+# Actuator settings
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - metrics
+          - env
+  endpoint:
+    health:
+      show-details: always

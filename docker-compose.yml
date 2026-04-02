@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: healthy_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: healthy_db
+      MYSQL_USER: healthy
+      MYSQL_PASSWORD: healthypass
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+  backend:
+    build: ./backend
+    container_name: healthy_backend
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/healthy_db?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: healthy
+      SPRING_DATASOURCE_PASSWORD: healthypass
+      AES_KEY: change_this_key_32_bytes_long
+    depends_on:
+      - mysql
+    ports:
+      - "8080:8080"
+  frontend:
+    build: ./frontend
+    container_name: healthy_frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+volumes:
+  db_data:

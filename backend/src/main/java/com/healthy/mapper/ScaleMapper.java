@@ -1,0 +1,9 @@
+package com.healthy.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.healthy.entity.Scale;
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface ScaleMapper extends BaseMapper<Scale> {
+}

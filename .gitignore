@@ -1,0 +1,34 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Logs
+*.log
+logs/
+backend/logs/
+
+# Java / Maven
+backend/target/
+*.class
+
+# Node / Frontend
+frontend/node_modules/
+frontend/dist/
+node_modules/
+
+# Env
+.env
+.env.*
+
+# Database backups / dumps
+*.sql.bak
+*.dump
+
+# Temporary
+*.tmp
+*.temp

@@ -1,0 +1,202 @@
+:root {
+  --student-blue-900: #2563eb;
+  --student-blue-700: #3B82F6;
+  --student-text-900: #111827;
+  --student-text-700: #4b5563;
+  --student-text-500: #9ca3af;
+  --student-border: #e5e7eb;
+  --student-surface: #ffffff;
+  --student-input-bg: #f9fafb;
+  --student-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+  --student-shadow-hover: 0 10px 24px rgba(15, 23, 42, 0.12);
+}
+
+.student-shell {
+  min-height: 100vh;
+  background: #f9fafb;
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.student-shell .content {
+  padding: 28px 16px 88px;
+}
+
+.student-shell .page {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.student-shell .page h1,
+.student-shell .page h2,
+.student-shell .page h3,
+.student-shell .page h4 {
+  color: var(--student-text-900);
+  font-weight: 700;
+}
+
+.student-shell .page p,
+.student-shell .page span,
+.student-shell .page div,
+.student-shell .page label,
+.student-shell .page li {
+  color: var(--student-text-700);
+}
+
+.student-shell .page .sub,
+.student-shell .page .hint,
+.student-shell .page .muted {
+  color: var(--student-text-500);
+}
+
+.student-shell .page .el-card {
+  border-radius: 16px;
+  border: 1px solid var(--student-border);
+  background: var(--student-surface);
+  box-shadow: var(--student-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.student-shell .page .el-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--student-shadow-hover);
+}
+
+.student-shell .el-button--primary {
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  background: var(--student-blue-700);
+}
+
+.student-shell .el-button--primary:hover {
+  background: var(--student-blue-900);
+}
+
+.student-shell .el-button:not(.el-button--primary):not(.el-button--danger) {
+  border-radius: 8px;
+  border-color: #d1d5db;
+  color: #1f2937;
+  background: #ffffff;
+}
+
+.student-shell .el-button.is-text {
+  border: none !important;
+  background: transparent !important;
+}
+
+.student-shell .el-input__wrapper,
+.student-shell .el-textarea__inner,
+.student-shell .el-select__wrapper {
+  border-radius: 8px;
+  background: var(--student-input-bg);
+  box-shadow: inset 0 0 0 1px #d1d5db;
+}
+
+.student-shell .el-input__wrapper.is-focus,
+.student-shell .el-select__wrapper.is-focused,
+.student-shell .el-textarea__inner:focus {
+  box-shadow: inset 0 0 0 1px var(--student-blue-700), 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.student-shell .el-radio__input.is-checked .el-radio__inner {
+  border-color: var(--student-blue-700);
+  background: var(--student-blue-700);
+}
+
+.student-shell .el-radio__input.is-checked + .el-radio__label {
+  color: var(--student-blue-900);
+  font-weight: 600;
+}
+
+.student-shell .el-radio {
+  margin: 0 10px 10px 0;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #ffffff;
+}
+
+.student-shell .el-radio.is-checked {
+  background: #dbeafe;
+  border-color: #3b82f6;
+}
+
+.student-shell .el-table {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--student-border);
+}
+
+.student-shell .el-table th.el-table__cell {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.student-shell .el-tag--success {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
+}
+
+.student-shell .el-tag--warning {
+  background: #fef9c3;
+  border-color: #fde047;
+  color: #854d0e;
+}
+
+.student-shell .el-tag--info {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.student-shell .chat-window {
+  border-radius: 12px;
+  border: 1px solid var(--student-border);
+  background: #f9fafb;
+}
+
+.student-shell .bubble {
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.student-shell .msg.user .bubble {
+  background: var(--student-blue-700);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+.student-shell .floating-ai .el-button {
+  width: 56px;
+  height: 56px;
+  font-size: 18px;
+  box-shadow: 0 10px 24px rgba(59, 130, 246, 0.4);
+}
+
+.student-shell .el-overlay-dialog .el-dialog {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.student-shell .el-loading-mask {
+  backdrop-filter: blur(2px);
+}
+
+.student-shell-footer {
+  margin-top: 20px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 12px;
+  padding-bottom: 18px;
+}
+
+@media (max-width: 768px) {
+  .student-shell .content {
+    padding: 16px 10px 78px;
+  }
+
+  .student-shell .page {
+    max-width: 100%;
+  }
+}

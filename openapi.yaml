@@ -1,0 +1,71 @@
+openapi: 3.0.1
+info:
+  title: Healthy Counseling API
+  version: 0.1.0
+servers:
+  - url: /api
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                account:
+                  type: string
+                password:
+                  type: string
+                name:
+                  type: string
+                studentId:
+                  type: string
+                gender:
+                  type: string
+      responses:
+        '200':
+          description: OK
+  /auth/login:
+    post:
+      summary: Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                account:
+                  type: string
+                password:
+                  type: string
+                role:
+                  type: string
+      responses:
+        '200':
+          description: token
+  /counselors:
+    get:
+      summary: list counselors
+      responses:
+        '200':
+          description: list
+  /appointments:
+    post:
+      summary: create appointment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                counselorId:
+                  type: integer
+                startTime:
+                  type: string
+                endTime:
+                  type: string
+      responses:
+        '200':
+          description: created
