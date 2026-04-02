@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div class="page admin-page">
     <el-row :gutter="14">
       <el-col :xs="24" :md="9">
         <el-card>
@@ -7,14 +7,21 @@
             <h2>量表管理</h2>
             <el-button type="primary" @click="openScale(null)">新建量表</el-button>
           </div>
-          <el-table :data="scales" v-loading="loadingScales" height="540" @row-click="pickScale">
+          <div class="batch-floating" v-if="selectedScales.length">
+            已选中 {{ selectedScales.length }} 个量表
+            <el-button size="small" type="danger" @click="batchRemoveScales">批量删除</el-button>
+          </div>
+          <el-table :data="scales" v-loading="loadingScales" height="540" @row-click="pickScale" @selection-change="selectedScales = $event">
+            <el-table-column type="selection" width="50" />
             <el-table-column prop="code" label="编码" width="120" />
             <el-table-column prop="name" label="名称" min-width="130" />
             <el-table-column prop="questionCount" label="题数" width="70" />
             <el-table-column width="90" label="操作">
               <template #default="{ row }">
-                <el-button text type="primary" @click.stop="openScale(row)">编辑</el-button>
-                <el-button text type="danger" @click.stop="removeScale(row)">删</el-button>
+                <div class="table-actions text-mode">
+                  <el-button text type="primary" @click.stop="openScale(row)">编辑</el-button>
+                  <el-button text type="danger" @click.stop="removeScale(row)">删</el-button>
+                </div>
               </template>
             </el-table-column>
           </el-table>
@@ -28,15 +35,18 @@
             <el-button type="primary" :disabled="!currentScale" @click="openQuestion(null)">新增题目</el-button>
           </div>
           <div v-if="!currentScale" class="muted">请先选择左侧量表</div>
-          <el-table v-else :data="questions" v-loading="loadingQuestions" height="540">
+          <el-table v-else :data="questions" v-loading="loadingQuestions" height="540" @selection-change="selectedQuestions = $event">
+            <el-table-column type="selection" width="50" />
             <el-table-column prop="seq" label="序号" width="70" />
             <el-table-column prop="text" label="题干" min-width="220" />
             <el-table-column prop="dimension" label="维度" width="110" />
             <el-table-column prop="reverseScore" label="反向" width="80" />
             <el-table-column label="操作" width="150">
               <template #default="{ row }">
-                <el-button size="small" @click="openQuestion(row)">编辑</el-button>
-                <el-button size="small" type="danger" @click="removeQuestion(row)">删除</el-button>
+                <div class="table-actions cols-2">
+                  <el-button size="small" @click="openQuestion(row)">编辑</el-button>
+                  <el-button size="small" type="danger" @click="removeQuestion(row)">删除</el-button>
+                </div>
               </template>
             </el-table-column>
           </el-table>
@@ -82,6 +92,8 @@ const questions = ref([])
 const currentScale = ref(null)
 const loadingScales = ref(false)
 const loadingQuestions = ref(false)
+const selectedScales = ref([])
+const selectedQuestions = ref([])
 const showScaleDialog = ref(false)
 const showQuestionDialog = ref(false)
 const reverseSwitch = ref(false)
@@ -197,6 +209,14 @@ const removeQuestion = async (row) => {
   } catch (error) {
     ElMessage.error(error?.response?.data?.msg || error?.response?.data?.error || '删除失败')
   }
+}
+
+const batchRemoveScales = async () => {
+  for (const row of selectedScales.value) {
+    await axios.delete(`/api/admin/scales/${row.id}`)
+  }
+  ElMessage.success('批量删除成功')
+  await loadScales()
 }
 
 onMounted(loadScales)

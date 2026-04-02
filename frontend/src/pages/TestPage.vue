@@ -1,33 +1,44 @@
 <template>
   <div class="page">
-    <el-card v-loading="loading">
-      <h2>在线答题 - {{ scaleName }}</h2>
-      <p class="hint" style="margin-top:-4px">共 {{ questions.length }} 题，已作答 {{ answeredCount }} 题。</p>
+    <el-card v-loading="loading" class="test-card">
+      <div class="head-row">
+        <div>
+          <h2>{{ scaleName }}</h2>
+          <p class="hint">共 {{ questions.length }} 题，已作答 {{ answeredCount }} 题</p>
+        </div>
+        <el-button @click="backToScales">返回量表</el-button>
+      </div>
 
       <div class="progress-bar" v-if="questions.length > 0">
-        <div class="progress-fill" :style="{ width: ((answeredCount / questions.length) * 100).toFixed(0) + '%' }"></div>
+        <div class="progress-fill" :style="{ width: ((answeredCount / questions.length) * 100).toFixed(0) + '%' }" />
       </div>
 
       <el-empty v-if="!loading && questions.length === 0" description="暂无题目" />
 
-      <div v-else class="question card-hover">
-        <div class="progress">第 {{ currentIndex + 1 }} / {{ questions.length }} 题</div>
-        <p><strong>{{ currentQuestion.seq || currentIndex + 1 }}.</strong> {{ currentQuestion.text }}</p>
-        <el-radio-group v-model="answers[currentQuestion.id]">
-          <el-radio v-for="opt in parseOptions(currentQuestion.options)" :key="opt.value" :label="opt.value">
-            {{ opt.label }}
-          </el-radio>
-        </el-radio-group>
-      </div>
+      <div v-else class="question-wrap">
+        <div class="question card-hover">
+          <div class="progress">第 {{ currentIndex + 1 }} / {{ questions.length }} 题</div>
+          <p class="question-text">{{ currentQuestion.seq || currentIndex + 1 }}. {{ currentQuestion.text }}</p>
 
-      <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:center">
-        <div>
-          <el-button @click="backToScales">返回量表列表</el-button>
+          <div class="option-list">
+            <label
+              v-for="opt in parseOptions(currentQuestion.options)"
+              :key="opt.value"
+              :class="['option-item', { active: answers[currentQuestion.id] === opt.value }]"
+            >
+              <input type="radio" :value="opt.value" v-model="answers[currentQuestion.id]" />
+              <span>{{ opt.label }}</span>
+            </label>
+          </div>
         </div>
-        <div>
-          <el-button :disabled="currentIndex === 0" @click="prevQuestion">上一题</el-button>
-          <el-button :disabled="currentIndex >= questions.length - 1" @click="nextQuestion">下一题</el-button>
-          <el-button type="primary" :disabled="!allAnswered || submitting" :loading="submitting" @click="submit">提交测评</el-button>
+
+        <div class="bottom-bar">
+          <div class="index-pill">{{ currentIndex + 1 }} / {{ questions.length || 0 }}</div>
+          <div class="actions">
+            <el-button :disabled="currentIndex === 0" @click="prevQuestion">上一题</el-button>
+            <el-button :disabled="currentIndex >= questions.length - 1" @click="nextQuestion">下一题</el-button>
+            <el-button type="primary" :disabled="!allAnswered || submitting" :loading="submitting" @click="submit">提交测评</el-button>
+          </div>
         </div>
       </div>
     </el-card>
@@ -149,9 +160,102 @@ onMounted(load)
 </script>
 
 <style scoped>
-.page { max-width:960px; margin: 24px auto; padding: 0 16px }
-.question { margin: 12px 0; padding: 16px; border: 1px solid #e5e7eb; border-radius: 16px; background: #fff }
-.progress { color:#76839b; margin-bottom: 8px }
-.progress-bar { height:8px; border-radius:999px; background:#e5e7eb; overflow:hidden; margin: 8px 0 14px }
-.progress-fill { height:100%; background:#3b82f6; transition: width .3s ease }
+.page { max-width: 980px; margin: 0 auto; }
+.test-card { border-radius: 16px; }
+.head-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.hint { color: var(--color-text-secondary); margin-top: 4px; }
+
+.progress-bar {
+  margin: 12px 0 16px;
+  height: 4px;
+  border-radius: 999px;
+  background: #d1d5db;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--color-student);
+  transition: width .25s ease;
+}
+
+.question-wrap {
+  margin-top: 8px;
+}
+
+.question {
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
+  padding: 22px;
+  background: #fff;
+}
+
+.progress {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+  margin-bottom: 8px;
+}
+
+.question-text {
+  font-size: 24px;
+  line-height: 1.45;
+  margin: 0 0 18px;
+  color: var(--color-text-primary);
+}
+
+.option-list {
+  display:grid;
+  gap: 10px;
+}
+
+.option-item {
+  min-height: 52px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  padding: 0 12px;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.option-item input { accent-color: var(--color-student); }
+
+.option-item.active {
+  border-color: #60a5fa;
+  background: #eff6ff;
+}
+
+.bottom-bar {
+  margin-top: 14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.index-pill {
+  height: 36px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  padding: 0 14px;
+  display:flex;
+  align-items:center;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.actions {
+  display:flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
 </style>

@@ -1,19 +1,6 @@
-:root {
-  --student-blue-900: #2563eb;
-  --student-blue-700: #3B82F6;
-  --student-text-900: #111827;
-  --student-text-700: #4b5563;
-  --student-text-500: #9ca3af;
-  --student-border: #e5e7eb;
-  --student-surface: #ffffff;
-  --student-input-bg: #f9fafb;
-  --student-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
-  --student-shadow-hover: 0 10px 24px rgba(15, 23, 42, 0.12);
-}
-
 .student-shell {
   min-height: 100vh;
-  background: #f9fafb;
+  background: var(--color-bg-secondary);
   font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
@@ -74,9 +61,9 @@
 
 .student-shell .el-button:not(.el-button--primary):not(.el-button--danger) {
   border-radius: 8px;
-  border-color: #d1d5db;
-  color: #1f2937;
-  background: #ffffff;
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
 }
 
 .student-shell .el-button.is-text {
@@ -89,7 +76,7 @@
 .student-shell .el-select__wrapper {
   border-radius: 8px;
   background: var(--student-input-bg);
-  box-shadow: inset 0 0 0 1px #d1d5db;
+  box-shadow: inset 0 0 0 1px var(--color-border);
 }
 
 .student-shell .el-input__wrapper.is-focus,
@@ -110,15 +97,15 @@
 
 .student-shell .el-radio {
   margin: 0 10px 10px 0;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 8px 12px;
-  background: #ffffff;
+  background: var(--color-bg-primary);
 }
 
 .student-shell .el-radio.is-checked {
-  background: #dbeafe;
-  border-color: #3b82f6;
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
 }
 
 .student-shell .el-table {
@@ -128,8 +115,8 @@
 }
 
 .student-shell .el-table th.el-table__cell {
-  background: #f3f4f6;
-  color: #111827;
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
 }
 
 .student-shell .el-tag--success {
@@ -153,12 +140,12 @@
 .student-shell .chat-window {
   border-radius: 12px;
   border: 1px solid var(--student-border);
-  background: #f9fafb;
+  background: var(--color-bg-secondary);
 }
 
 .student-shell .bubble {
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
 }
 
 .student-shell .msg.user .bubble {

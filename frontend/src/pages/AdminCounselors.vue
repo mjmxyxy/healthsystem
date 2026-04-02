@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div class="page admin-page">
     <el-card>
       <div class="head">
         <h2>咨询师管理</h2>
@@ -9,7 +9,14 @@
         </div>
       </div>
 
-      <el-table :data="rows" v-loading="loading">
+      <div class="batch-floating" v-if="selectedRows.length">
+        已选中 {{ selectedRows.length }} 项
+        <el-button size="small" @click="batchApprove">批量通过</el-button>
+        <el-button size="small" type="danger" @click="batchOffShelf">批量下架</el-button>
+      </div>
+
+      <el-table :data="rows" v-loading="loading" @selection-change="selectedRows = $event">
+        <el-table-column type="selection" width="50" />
         <el-table-column prop="account" label="账号" width="150" />
         <el-table-column prop="name" label="姓名" width="140" />
         <el-table-column prop="gender" label="性别" width="90" />
@@ -26,12 +33,14 @@
         <el-table-column prop="createdAt" label="创建时间" min-width="180" />
         <el-table-column label="操作" min-width="320" fixed="right">
           <template #default="{ row }">
-            <el-button size="small" type="success" @click="review(row, 1)">通过</el-button>
-            <el-button size="small" type="warning" @click="review(row, 0)">驳回</el-button>
-            <el-button size="small" :type="row.disabled ? 'success' : 'danger'" @click="shelve(row)">
-              {{ row.disabled ? '上架' : '下架' }}
-            </el-button>
-            <el-button size="small" @click="openEdit(row)">编辑</el-button>
+            <div class="table-actions cols-4">
+              <el-button size="small" type="success" @click="review(row, 1)">通过</el-button>
+              <el-button size="small" type="warning" @click="review(row, 0)">驳回</el-button>
+              <el-button size="small" :type="row.disabled ? 'success' : 'danger'" @click="shelve(row)">
+                {{ row.disabled ? '上架' : '下架' }}
+              </el-button>
+              <el-button size="small" @click="openEdit(row)">编辑</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -66,6 +75,7 @@ import { ElMessage } from 'element-plus'
 const loading = ref(false)
 const keyword = ref('')
 const rows = ref([])
+const selectedRows = ref([])
 const showEdit = ref(false)
 const editForm = reactive({ id: null, name: '', gender: '' })
 
@@ -123,6 +133,22 @@ const saveEdit = async () => {
   } catch (error) {
     ElMessage.error(error?.response?.data?.msg || error?.response?.data?.error || '保存失败')
   }
+}
+
+const batchApprove = async () => {
+  for (const row of selectedRows.value) {
+    await axios.post(`/api/admin/counselors/${row.id}/review`, { approved: 1 })
+  }
+  ElMessage.success('批量通过成功')
+  await load()
+}
+
+const batchOffShelf = async () => {
+  for (const row of selectedRows.value) {
+    await axios.post(`/api/admin/counselors/${row.id}/shelve`, { disabled: 1 })
+  }
+  ElMessage.success('批量下架成功')
+  await load()
 }
 
 onMounted(load)

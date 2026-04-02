@@ -1,5 +1,10 @@
 <template>
   <div class="login-page">
+    <div class="auth-intro">
+      <h1>欢迎使用安心咨询</h1>
+      <p>在这里开始你的心理测评、预约咨询和成长记录。请先登录进入个人空间。</p>
+    </div>
+
     <el-card class="box-card">
       <div slot="header">登录</div>
       <el-form :model="form">
@@ -21,9 +26,6 @@
           <el-button native-type="button" @click="goRegister" style="margin-left:8px">注册</el-button>
           <el-button native-type="button" @click="goReset" style="margin-left:8px">忘记密码</el-button>
         </el-form-item>
-        <div style="color:#888;font-size:12px;line-height:1.6;margin-top:8px">
-          演示账号：student_demo / 123456，咨询师账号：counselor_demo / 123456，管理员账号：admin_demo / 123456
-        </div>
       </el-form>
     </el-card>
   </div>
@@ -77,6 +79,54 @@ const goReset = () => router.push('/reset')
 </script>
 
 <style scoped>
-.login-page { display:flex; justify-content:center; align-items:center; height:100vh }
+.login-page {
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  padding: 24px 16px;
+  gap: 16px;
+  background-image:
+    linear-gradient(135deg, rgba(233, 245, 246, 0.42), rgba(244, 249, 255, 0.48)),
+    url('/images/brance.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.auth-intro {
+  max-width: 460px;
+  text-align: center;
+  color: #0f2742;
+}
+.auth-intro h1 {
+  margin: 0 0 8px;
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 12px rgba(255, 255, 255, 0.75);
+}
+.auth-intro p {
+  margin: 0;
+  color: #294661;
+  line-height: 1.8;
+  font-size: 16px;
+  font-weight: 500;
+}
 .box-card { width:400px }
+
+:deep(.el-card) {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+}
+
+@media (max-width: 768px) {
+  .auth-intro h1 {
+    font-size: 32px;
+  }
+
+  .auth-intro p {
+    font-size: 15px;
+  }
+}
 </style>

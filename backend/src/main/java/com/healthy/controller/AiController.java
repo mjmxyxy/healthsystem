@@ -43,8 +43,8 @@ public class AiController {
 
             if (apiKey == null || apiKey.isBlank()) {
                 return ResponseEntity.status(503).body(Map.of(
-                        "error", "ai_not_configured",
-                        "detail", "未配置真实大模型密钥，请设置 AI_API_KEY（或 ARK_API_KEY / OPENAI_API_KEY）后重试"
+                    "error", "ai_not_configured",
+                    "detail", "未配置真实大模型密钥，请设置 AI_API_KEY 后重试"
                 ));
             }
 

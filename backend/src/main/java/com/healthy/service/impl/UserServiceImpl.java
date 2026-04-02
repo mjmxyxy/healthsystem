@@ -25,7 +25,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByAccount(String account) {
         try {
-            return userMapper.selectByAccount(account);
+            return userMapper.selectOne(new QueryWrapper<User>()
+                    .select("id", "account", "password", "name", "student_id", "gender", "role", "verified", "created_at", "updated_at")
+                    .eq("account", account)
+                    .last("LIMIT 1"));
         } catch (Exception ex) {
             logger.error("Error querying user by account {}", account, ex);
             return null;
@@ -36,7 +39,10 @@ public class UserServiceImpl implements UserService {
     public User findById(Long id) {
         if (id == null) return null;
         try {
-            return userMapper.selectByIdSafe(id);
+            return userMapper.selectOne(new QueryWrapper<User>()
+                    .select("id", "account", "password", "name", "student_id", "gender", "role", "verified", "created_at", "updated_at")
+                    .eq("id", id)
+                    .last("LIMIT 1"));
         } catch (Exception ex) {
             logger.error("Error querying user by id {}", id, ex);
             return null;

@@ -52,12 +52,13 @@ public class AuthController {
         }
         String token = userService.login(account, password, role);
         if (token == null) return ResponseEntity.status(401).body(Map.of("error", "invalid credentials or role"));
+        User user = userService.findByAccount(account);
         Map<String, Object> resp = new HashMap<>();
         resp.put("token", token);
-        resp.put("role", role.isEmpty() ? userService.findByAccount(account).getRole() : role);
-        try {
-            resp.put("userId", userService.findByAccount(account).getId());
-        } catch (Exception ignored) {}
+        resp.put("role", role.isEmpty() && user != null ? user.getRole() : role);
+        if (user != null) {
+            resp.put("userId", user.getId());
+        }
         return ResponseEntity.ok(resp);
     }
 

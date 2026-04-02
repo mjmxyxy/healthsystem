@@ -1,40 +1,49 @@
 <template>
-  <div class="page">
+  <div class="page admin-page">
     <el-card>
       <div class="head">
         <h2>科普文章审核</h2>
         <div class="ops">
-          <el-select v-model="status" clearable placeholder="全部状态" style="width: 170px">
-            <el-option label="草稿" :value="0" />
-            <el-option label="待审核" :value="1" />
-            <el-option label="已发布" :value="2" />
-            <el-option label="已拒绝" :value="3" />
-          </el-select>
-          <el-button @click="load">筛选</el-button>
+          <el-radio-group v-model="status" @change="load">
+            <el-radio-button :label="''">全部</el-radio-button>
+            <el-radio-button :label="1">待审核</el-radio-button>
+            <el-radio-button :label="2">已通过</el-radio-button>
+            <el-radio-button :label="3">已驳回</el-radio-button>
+          </el-radio-group>
         </div>
       </div>
 
-      <el-table :data="rows" v-loading="loading">
-        <el-table-column prop="title" label="标题" min-width="180" show-overflow-tooltip />
-        <el-table-column prop="authorName" label="作者" width="120" />
-        <el-table-column prop="statusText" label="状态" width="100" />
-        <el-table-column prop="createTime" label="创建时间" min-width="170" />
-        <el-table-column prop="publishTime" label="发布时间" min-width="170" />
-        <el-table-column label="操作" width="220" fixed="right">
-          <template #default="{ row }">
-            <el-button size="small" @click="preview(row)">预览</el-button>
-            <el-button size="small" type="success" @click="review(row, 1)" :disabled="row.status === 2">通过</el-button>
-            <el-button size="small" type="danger" @click="review(row, 0)" :disabled="row.status === 3">驳回</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+      <div class="card-flow" v-loading="loading">
+        <div class="article-card" v-for="row in rows" :key="row.id">
+          <div class="cover">封面</div>
+          <div class="info">
+            <div class="title">{{ row.title }}</div>
+            <div class="meta">作者：{{ row.authorName || '-' }} | {{ row.createTime || '-' }}</div>
+            <div class="summary">{{ shortSummary(row.content) }}</div>
+            <div class="btn-row">
+              <el-button size="small" @click="preview(row)">预览</el-button>
+              <el-button size="small" type="success" @click="review(row, 1)" :disabled="row.status === 2">通过</el-button>
+              <el-button size="small" type="danger" @click="openReject(row)" :disabled="row.status === 3">驳回</el-button>
+            </div>
+          </div>
+        </div>
+        <el-empty v-if="!rows.length" description="暂无文章" />
+      </div>
     </el-card>
 
-    <el-dialog v-model="showPreview" title="文章预览" width="760px">
+    <el-dialog v-model="showPreview" title="文章预览" width="820px">
       <h3>{{ current?.title }}</h3>
       <div class="meta">作者：{{ current?.authorName || '-' }}，状态：{{ current?.statusText || '-' }}</div>
       <el-divider />
       <div class="content">{{ current?.content }}</div>
+    </el-dialog>
+
+    <el-dialog v-model="showReject" title="驳回原因" width="460px">
+      <el-input v-model="rejectReason" type="textarea" :rows="4" placeholder="请填写驳回原因" />
+      <template #footer>
+        <el-button @click="showReject = false">取消</el-button>
+        <el-button type="danger" @click="confirmReject">确认驳回</el-button>
+      </template>
     </el-dialog>
   </div>
 </template>
@@ -49,6 +58,9 @@ const rows = ref([])
 const status = ref()
 const showPreview = ref(false)
 const current = ref(null)
+const showReject = ref(false)
+const rejectReason = ref('')
+const pendingReject = ref(null)
 
 const parseData = (res) => {
   const body = res?.data || {}
@@ -72,14 +84,34 @@ const preview = (row) => {
   showPreview.value = true
 }
 
-const review = async (row, approved) => {
+const openReject = (row) => {
+  pendingReject.value = row
+  rejectReason.value = ''
+  showReject.value = true
+}
+
+const confirmReject = () => {
+  if (!rejectReason.value.trim()) {
+    ElMessage.warning('请填写驳回原因')
+    return
+  }
+  showReject.value = false
+  review(pendingReject.value, 0, rejectReason.value.trim())
+}
+
+const review = async (row, approved, reason = '') => {
   try {
-    await axios.post(`/api/admin/articles/${row.id}/review`, { approved })
+    await axios.post(`/api/admin/articles/${row.id}/review`, { approved, reason })
     ElMessage.success(approved ? '已通过' : '已驳回')
     await load()
   } catch (error) {
     ElMessage.error(error?.response?.data?.msg || error?.response?.data?.error || '审核失败')
   }
+}
+
+const shortSummary = (txt = '') => {
+  const s = String(txt || '').replace(/\s+/g, ' ').trim()
+  return s.length > 100 ? `${s.slice(0, 100)}...` : s
 }
 
 onMounted(load)
@@ -91,4 +123,36 @@ onMounted(load)
 .ops { display:flex; gap: 8px; }
 .meta { color:#6b7280; font-size: 13px; }
 .content { white-space: pre-wrap; line-height: 1.8; color:#111827; }
+
+.card-flow { display:grid; gap: 12px; }
+
+.article-card {
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 10px;
+  display:grid;
+  grid-template-columns: 120px 1fr;
+  gap: 12px;
+  background: #fff;
+}
+
+.cover {
+  width: 120px;
+  height: 80px;
+  border-radius: 8px;
+  background: linear-gradient(120deg, #fde68a, #fed7aa);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color: #92400e;
+}
+
+.title { color: var(--color-text-primary); font-weight: 600; }
+.summary { margin-top: 6px; color: var(--color-text-secondary); line-height: 1.7; }
+.btn-row { margin-top: 8px; display:flex; gap: 8px; }
+
+@media (max-width: 760px) {
+  .article-card { grid-template-columns: 1fr; }
+  .cover { width: 100%; }
+}
 </style>

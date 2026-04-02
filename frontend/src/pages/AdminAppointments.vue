@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div class="page admin-page">
     <el-card>
       <div class="head">
         <h2>预约订单管理</h2>
@@ -14,7 +14,13 @@
         </div>
       </div>
 
-      <el-table :data="rows" v-loading="loading">
+      <div class="batch-floating" v-if="selectedRows.length">
+        已选中 {{ selectedRows.length }} 项
+        <el-button size="small" type="warning" @click="batchMarkDone">批量标记完成</el-button>
+      </div>
+
+      <el-table :data="rows" v-loading="loading" @selection-change="selectedRows = $event">
+        <el-table-column type="selection" width="50" />
         <el-table-column prop="studentName" label="学生" width="140" />
         <el-table-column prop="counselorName" label="咨询师" width="140" />
         <el-table-column prop="apptTime" label="预约时间" min-width="180" />
@@ -39,6 +45,7 @@ import { ElMessage } from 'element-plus'
 const loading = ref(false)
 const rows = ref([])
 const status = ref()
+const selectedRows = ref([])
 
 const parseData = (res) => {
   const body = res?.data || {}
@@ -59,6 +66,11 @@ const load = async () => {
 
 const statusText = (v) => ({ 0: '待确认', 1: '已确认', 2: '已完成', 3: '已取消' }[v] || '未知')
 const statusType = (v) => ({ 0: 'warning', 1: 'success', 2: 'info', 3: 'danger' }[v] || 'info')
+
+const batchMarkDone = async () => {
+  if (!selectedRows.value.length) return
+  ElMessage.info('当前后端未开放批量状态变更接口，请在后端补充后启用此操作')
+}
 
 onMounted(load)
 </script>

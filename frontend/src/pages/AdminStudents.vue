@@ -1,5 +1,5 @@
 <template>
-  <div class="page">
+  <div class="page admin-page">
     <el-card>
       <div class="head">
         <h2>学生管理</h2>
@@ -10,7 +10,13 @@
         </div>
       </div>
 
-      <el-table :data="rows" v-loading="loading">
+      <div class="batch-floating" v-if="selectedRows.length">
+        已选中 {{ selectedRows.length }} 项
+        <el-button size="small" type="danger" @click="batchDisable">批量禁用</el-button>
+      </div>
+
+      <el-table :data="rows" v-loading="loading" @selection-change="selectedRows = $event">
+        <el-table-column type="selection" width="50" />
         <el-table-column prop="account" label="账号" width="140" />
         <el-table-column prop="name" label="姓名" width="130" />
         <el-table-column prop="studentId" label="学号" width="150" />
@@ -28,10 +34,12 @@
         <el-table-column prop="createdAt" label="创建时间" min-width="180" />
         <el-table-column label="操作" width="190" fixed="right">
           <template #default="{ row }">
-            <el-button size="small" @click="viewDetail(row)">详情</el-button>
-            <el-button size="small" :type="row.disabled ? 'success' : 'danger'" @click="toggleDisabled(row)">
-              {{ row.disabled ? '恢复' : '禁用' }}
-            </el-button>
+            <div class="table-actions cols-2">
+              <el-button size="small" @click="viewDetail(row)">详情</el-button>
+              <el-button size="small" :type="row.disabled ? 'success' : 'danger'" @click="toggleDisabled(row)">
+                {{ row.disabled ? '恢复' : '禁用' }}
+              </el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -61,6 +69,7 @@ const rows = ref([])
 const keyword = ref('')
 const showDetail = ref(false)
 const detail = ref(null)
+const selectedRows = ref([])
 
 const parseData = (res) => {
   const body = res?.data || {}
@@ -102,6 +111,14 @@ const toggleDisabled = async (row) => {
 
 const exportCsv = () => {
   window.open('/api/admin/students/export', '_blank')
+}
+
+const batchDisable = async () => {
+  for (const row of selectedRows.value) {
+    await axios.post(`/api/admin/students/${row.id}/disable`, { disabled: 1 })
+  }
+  ElMessage.success('批量禁用完成')
+  await load()
 }
 
 onMounted(load)

@@ -17,10 +17,12 @@
         </el-table-column>
         <el-table-column label="操作" width="320">
           <template #default="{ row }">
-            <el-button size="small" type="primary" :disabled="row.statusCode !== 0" @click="approve(row)">同意</el-button>
-            <el-button size="small" type="danger" :disabled="row.statusCode !== 0" @click="reject(row)">拒绝</el-button>
-            <el-button size="small" :disabled="![0,1].includes(row.statusCode)" @click="cancel(row)">取消</el-button>
-            <el-button size="small" :disabled="row.statusCode !== 1" @click="enterChat(row)">聊天</el-button>
+            <div class="table-actions cols-4">
+              <el-button size="small" type="primary" :disabled="row.statusCode !== 0" @click="approve(row)">同意</el-button>
+              <el-button size="small" type="danger" :disabled="row.statusCode !== 0" @click="reject(row)">拒绝</el-button>
+              <el-button size="small" :disabled="![0,1].includes(row.statusCode)" @click="cancel(row)">取消</el-button>
+              <el-button size="small" :disabled="row.statusCode !== 1" @click="enterChat(row)">聊天</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
